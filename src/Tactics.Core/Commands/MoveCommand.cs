@@ -4,16 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tactics.Core.Movement;
 
 namespace Tactics.Core.Commands
 {
     public sealed class MoveCommand : ICommand
     {
-        public int UnitId { get; }
-        public GridPos Destination { get; }
-
         private GridPos _from; // Remembered by Execute so Undo can restore it.
         private bool _executed;
+
+        public int UnitId { get; }
+        public GridPos Destination { get; }
+        public bool IsUndoable => true;
 
         public MoveCommand(int unitId, GridPos destination)
         {
@@ -29,6 +31,10 @@ namespace Tactics.Core.Commands
             {
                 return CommandResult.Fail("That unit doesn't exist.");
             }
+            if (unit.Team != state.ActiveTeam)
+            {
+                return CommandResult.Fail($"It's not {unit.Name}'s turn.");
+            }
             if (unit.HasMoved)
             {
                 return CommandResult.Fail($"{unit.Name} has already moved this turn.");
@@ -41,9 +47,13 @@ namespace Tactics.Core.Commands
             {
                 return CommandResult.Fail("That tile is occupied."); // DEV-NOTE: This logic will be changed later. It does not consider walls.
             }
-            if (unit.Position.DistanceTo(Destination) > unit.MoveRange)
+            //if (unit.Position.DistanceTo(Destination) > unit.MoveRange)
+            //{
+            //    return CommandResult.Fail($"Out of range ({unit.MoveRange}) tiles.");
+            //}
+            if (!Pathfinder.FindMoves(state, unit).CanReach(Destination))
             {
-                return CommandResult.Fail($"Out of range ({unit.MoveRange}) tiles.");
+                return CommandResult.Fail("Can't reach that tile!");
             }
 
             return CommandResult.Success();

@@ -17,5 +17,6 @@ namespace Tactics.Core.Commands
         CommandResult Validate(GameState state);
         void Execute(GameState state);
         void Undo(GameState state);
+        bool IsUndoable { get; }
     }
 }

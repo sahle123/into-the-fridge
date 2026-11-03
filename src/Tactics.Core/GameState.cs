@@ -10,13 +10,39 @@ namespace Tactics.Core
     {
         private readonly List<Unit> _units = new();
 
+        // Valid battle phases
+        private static readonly Dictionary<BattlePhase, BattlePhase[]> AllowedTransitions = new()
+        {
+            [BattlePhase.PlayerTurn] = new[] { BattlePhase.EnemyTurn, BattlePhase.Victory, BattlePhase.Defeat },
+            [BattlePhase.EnemyTurn] = new[] { BattlePhase.PlayerTurn, BattlePhase.Victory, BattlePhase.Defeat },
+            [BattlePhase.Victory] = Array.Empty<BattlePhase>(),
+            [BattlePhase.Defeat] = Array.Empty<BattlePhase>(),
+        };
+
+        // Attempt to transition to another phase and throw an exception if it is not defined in `AllowedTransitions`.
+        internal void TransitionTo(BattlePhase next)
+        {
+            if (!AllowedTransitions[Phase].Contains(next))
+                throw new InvalidOperationException($"Can't go from {Phase} to {next}");
+            Phase = next;
+        }
+
         public BattleMap Map { get; }
+        public BattlePhase Phase { get; private set; } = BattlePhase.PlayerTurn;
+        public int TurnNumber { get; internal set; } = 1;
         public IReadOnlyList<Unit> Units => _units;
 
         public GameState(BattleMap map)
         {
             Map = map;
         }
+
+        public Team? ActiveTeam => Phase switch
+        {
+            BattlePhase.PlayerTurn => Team.Player,
+            BattlePhase.EnemyTurn => Team.Enemy,
+            _ => null,
+        };
 
         public Unit AddUnit(string name, Team team, GridPos position, int maxHp, int moveRange)
         {

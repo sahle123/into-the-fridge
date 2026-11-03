@@ -78,12 +78,14 @@ namespace Tactics.Core.Tests
             Assert.False(knight.HasMoved);
         }
 
-        [Fact(Skip = "Week 2: movement must follow paths around walls")]
+        //[Fact(Skip = "Week 2: movement must follow paths around walls")]
+        [Fact]
         public void Range_counts_the_path_around_walls_not_the_straight_distance()
         {
             var (state, knight) = NewBattle();
             // A wall down column 2 with a single gap at the bottom (y = 7).
-            for (var y = 0; y < 7; y++) state.Map[new GridPos(2, y)] = TileType.Blocked;
+            for (var y = 0; y < 7; y++)
+                state.Map[new GridPos(2, y)] = TileType.Blocked;
 
             // (3, 1) is 2 tiles away in a straight line but 14 steps around the wall.
 
