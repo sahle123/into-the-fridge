@@ -13,7 +13,7 @@ namespace Tactics.Core.Tests
         {
             var state = new GameState(new BattleMap(8, 8));
             var knight = state.AddUnit("Knight", Team.Player, new GridPos(1, 1), maxHp: 3, moveRange: 3);
-            var brute = state.AddUnit("Brute", Team.Player, new GridPos(6, 6), maxHp: 4, moveRange: 2);
+            var brute = state.AddUnit("Brute", Team.Enemy, new GridPos(6, 6), maxHp: 4, moveRange: 2);
 
             return (state, knight, brute);
         }

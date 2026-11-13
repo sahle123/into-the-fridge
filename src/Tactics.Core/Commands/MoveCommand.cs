@@ -75,7 +75,8 @@ namespace Tactics.Core.Commands
 
         public void Undo(GameState state)
         {
-            if (!_executed) throw new InvalidOperationException("Nothing to undo.");
+            if (!_executed)
+                throw new InvalidOperationException("Nothing to undo.");
 
             var unit = state.FindUnit(UnitId);
             unit.Position = _from;
